@@ -95,6 +95,8 @@ for key, value in bigram_prob.items():
 
 for key, value in bigram_pos_prob.items():
     value.sort(key = sortFunc)
+for key, value in pos_prob.items():
+    value.sort(key = sortFunc)
 model = {
     "bigram_prob" : bigram_prob,
     "bigram_pos_prob" : bigram_pos_prob,

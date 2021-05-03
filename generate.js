@@ -18,14 +18,24 @@ function getWord(words, probability){
     
 }
 
+function altGetWord(words, probability){
+    if(words.length == 1) return words[0][0]
+    let cumulative = 0
+    for(let i = 0; i < words.length -1; i++){
+        cumulative += words[i][1]
+        if(cumulative > probability)return words[i][0]
+    }
+    return words[words.length -1][0]
+}
+
 function word_generate(model){
     let bigram_prob = model.bigram_prob
     let sentence = ""
-    nextWord = getWord(bigram_prob["<START>"],Math.random())
+    nextWord = altGetWord(bigram_prob["<START>"],Math.random())
     while(nextWord != "<END>"){
         let space = (nextWord == "." || nextWord == ",") ? "" : " "
         sentence += space + nextWord
-        nextWord = getWord(bigram_prob[nextWord],Math.random())
+        nextWord = altGetWord(bigram_prob[nextWord],Math.random())
 
     }
     return sentence.trim()
@@ -35,14 +45,14 @@ function pos_generate(model){
     let bigram_pos_prob = model.bigram_pos_prob
     let pos_prob = model.pos_prob
     pos_list = []
-    nextPOS = getWord(bigram_pos_prob["<START>"], Math.random())
+    nextPOS = altGetWord(bigram_pos_prob["<START>"], Math.random())
     while(nextPOS != "<END>"){
         pos_list.push(nextPOS)
-        nextPOS = getWord(bigram_pos_prob[nextPOS], Math.random())
+        nextPOS = altGetWord(bigram_pos_prob[nextPOS], Math.random())
     }
     let sentence = ""
     pos_list.forEach(pos=>{
-        let nextWord = getWord(pos_prob[pos], Math.random())
+        let nextWord = altGetWord(pos_prob[pos], Math.random())
         let space = (nextWord == "." || nextWord == ",") ? "" : " "
         sentence += space + nextWord
     })
@@ -54,18 +64,18 @@ function hybrid_generate(model){
     let bigram_pos_prob = model.bigram_pos_prob
     let pos_prob = model.pos_prob
     pos_list = []
-    nextPOS = getWord(bigram_pos_prob["<START>"], Math.random())
+    nextPOS = altGetWord(bigram_pos_prob["<START>"], Math.random())
     while(nextPOS != "<END>"){
         pos_list.push(nextPOS)
-        nextPOS = getWord(bigram_pos_prob[nextPOS], Math.random())
+        nextPOS = altGetWord(bigram_pos_prob[nextPOS], Math.random())
     }
     let sentence = ""
     let currentWord = "<START>"
     pos_list.forEach(pos=>{
         
-        let nextWord = getWord(pos_prob[pos], Math.random())
+        let nextWord = altGetWord(pos_prob[pos], Math.random())
         while(bigram_prob[currentWord].map(word=>word[0]).includes(nextWord)){
-           nextWord = getWord(pos_prob[pos], Math.random())
+           nextWord = altGetWord(pos_prob[pos], Math.random())
 
         }
         currentWord = nextWord
