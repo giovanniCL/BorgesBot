@@ -1,5 +1,6 @@
 const fs = require('fs')
 const model = JSON.parse(fs.readFileSync('model.json', 'latin1'))
+const ngram_model = JSON.parse(fs.readFileSync('ngram_model.json', 'latin1'))
 
 function getWord(words, probability){
     
@@ -29,7 +30,7 @@ function altGetWord(words, probability){
 }
 
 function word_generate(model){
-    let bigram_prob = model.bigram_prob
+    let bigram_prob = ngram_model.bigram_prob
     let sentence = ""
     nextWord = altGetWord(bigram_prob["<START>"],Math.random())
     while(nextWord != "<END>"){
@@ -85,5 +86,37 @@ function hybrid_generate(model){
     return sentence.trim()
 }
 
-let output = word_generate(model)
-console.log(output)
+function trigram_generate(model){
+    let trigram_prob = model.trigram_prob
+    let bigram_prob = model.bigram_prob
+    let sentence = ""
+    nextWord = altGetWord(trigram_prob["<START>"]["<START>"], Math.random())
+    nextNextWord = altGetWord(trigram_prob["<START>"][nextWord], Math.random())
+    while(nextWord != "<END>"){
+        //console.log(nextWord + " " + nextNextWord)
+        //console.log(trigram_prob[nextWord])
+        //console.log(trigram_prob[nextWord][nextNextWord])
+        let space = (nextWord == "." || nextWord == "," || nextWord == "?" || nextWord == "!" || nextWord == ";") ? "" : " "
+        sentence += space + nextWord
+        let temp = nextNextWord
+        try{
+            nextNextWord = altGetWord(trigram_prob[nextWord][nextNextWord], Math.random())
+        }catch(e){
+            nextNextWord = altGetWord(bigram_prob[nextNextWord], Math.random())
+        }
+        nextWord = temp
+    }
+    return sentence.trim()
+}
+
+let output = trigram_generate(ngram_model)
+fs.writeFileSync("./output.txt","")
+for(let i = 0; i < 10; i++){
+    let output = word_generate(ngram_model)
+    fs.appendFileSync("./output.txt",output + "\n")
+}
+fs.appendFileSync("output.txt","\n")
+for(let i = 0; i < 10; i++){
+    let output = trigram_generate(ngram_model)
+    fs.appendFileSync("./output.txt",output + "\n")
+}
