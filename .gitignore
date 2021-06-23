@@ -3,3 +3,5 @@ node_modules
 model.json
 ngram_model.json
 output.txt
+.vscode
+.env

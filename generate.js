@@ -120,3 +120,4 @@ for(let i = 0; i < 10; i++){
     let output = trigram_generate(ngram_model)
     fs.appendFileSync("./output.txt",output + "\n")
 }
+module.exports = {trigram_generate, getWord, ngram_model}
